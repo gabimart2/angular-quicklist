@@ -32,6 +32,10 @@ export class ChecklistItemService {
   add$ = new Subject<AddChecklistItem>();
   toggle$ = new Subject<RemoveChecklistItem>();
   reset$ = new Subject<RemoveChecklist>();
+  remove$ = new Subject<RemoveChecklistItem>();
+  edit$ = new Subject<EditChecklistItem>();
+  checklistRemoved$ = new Subject<RemoveChecklist>();
+
 
   private checklistItemsLoaded$ = this.storageService.loadChecklistItems();
 
@@ -105,5 +109,38 @@ export class ChecklistItemService {
         this.state.update(state => ({ ...state, error }))
       }
     })
+
+    this.remove$.pipe(
+      takeUntilDestroyed(),
+      tap((data) => console.log("Delete checklist item: ", data))
+    ).subscribe((itemId) => {
+      this.state.update(state => ({
+        ...state,
+        checklistItems: state.checklistItems.filter(item => item.id !== itemId)
+      }))
+    })
+
+    this.edit$.pipe(
+      takeUntilDestroyed(),
+      tap((data) => console.log("Edit checklist item: ", data))
+    ).subscribe((editedItem) => {
+      this.state.update(state => ({
+        ...state,
+        checklistItems: state.checklistItems.map(item => 
+          item.id === editedItem.id ? { ...item, ...editedItem.data } : item
+        )
+      }))
+    })
+
+    this.checklistRemoved$.pipe(
+      takeUntilDestroyed(),
+      tap((data) => console.log("Checklist removed: ", data))
+    ).subscribe((checklistId) => {
+      this.state.update(state => ({ 
+        ...state, 
+        checklistItems: state.checklistItems.filter(item => item.checklistId !== checklistId) 
+      }))
+    })
+    
   }
 }

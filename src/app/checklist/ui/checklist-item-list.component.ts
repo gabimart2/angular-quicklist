@@ -8,17 +8,20 @@ import { ChecklistItem, RemoveChecklistItem } from '../../shared/interfaces/chec
     <section>
       <ul>
         @for (item of checklistItems(); track item.id){
-          <li class="checklist-item" (click)="toggle.emit(item.id)">
-            <div>
+          <li class="checklist-item">
+              <div (click)="toggle.emit(item.id)">
               @if (item.checked){
                 <span>✅</span>
               }
               @else {
                 <span>❌</span>
               }
-              {{ item.title }}
-              
-            </div>
+                {{ item.title }}
+              </div>
+              <div>
+                <button (click)="edit.emit(item)">Edit</button>
+                <button (click)="delete.emit(item.id)">Delete</button>
+              </div>
           </li>
         } @empty {
         <div>
@@ -40,5 +43,7 @@ import { ChecklistItem, RemoveChecklistItem } from '../../shared/interfaces/chec
 export class ChecklistItemListComponent {
   checklistItems = input.required<ChecklistItem[]>();
   toggle = output<RemoveChecklistItem>();
+  delete = output<RemoveChecklistItem>();
+  edit = output<ChecklistItem>();
 
 }

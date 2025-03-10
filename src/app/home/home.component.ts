@@ -18,14 +18,25 @@ import { CheckListComponent } from './ui/checklist-list.component';
     </header>
     <section>
       <h2>Your checklists</h2>
-      <app-checklist-list [checklists]="checklistService.checklists()" />
+      <app-checklist-list 
+        [checklists]="checklistService.checklists()" 
+        (delete)="checklistService.remove$.next($event)"
+        (edit)="checklistBeingEdited.set($event)"
+      />
     </section>
     <app-modal [isOpen]="!!checklistBeingEdited()">
       <ng-template> 
         <app-form-modal 
           [formGroup]="checklistForm "
           [title]="checklistBeingEdited()?.title ?? 'Add Checklist'"
-          (save)="checklistService.add$.next(checklistForm.getRawValue())"
+          (save)="
+            checklistBeingEdited()?.id ? 
+              checklistService.edit$.next({
+                id: checklistBeingEdited()!.id!,
+                data: checklistForm.getRawValue()
+              })
+            : checklistService.add$.next(checklistForm.getRawValue()) 
+          "
           (close)="checklistBeingEdited.set(null)"
         />  
       </ng-template>    
@@ -50,6 +61,14 @@ export default class HomeComponent {
 
       if(!checklist){
         this.checklistForm.reset()
+      }
+      else{
+        this.checklistForm.patchValue(
+          {
+            ...this.checklistForm,
+            ...checklist
+          }
+        )
       }
     })
   }

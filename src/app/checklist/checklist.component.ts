@@ -23,6 +23,8 @@ import { ChecklistItemListComponent } from './ui/checklist-item-list.component';
       <app-checklist-item-list 
         [checklistItems]="checklistItems()"
         (toggle)="checklistItemService.toggle$.next($event)" 
+        (delete)="checklistItemService.remove$.next($event)"
+        (edit)="checklistItemBeingEdited.set($event)"
       />
     }
     <app-modal [isOpen]="!!checklistItemBeingEdited()">
@@ -30,10 +32,17 @@ import { ChecklistItemListComponent } from './ui/checklist-item-list.component';
           <app-form-modal
             title="Create item"
             [formGroup]="checklistItemForm"
-            (save)="checklistItemService.add$.next({
-              item: checklistItemForm.getRawValue(),
-              checklistId: checklist()?.id!,
-            })"
+            (save)="
+              checklistItemBeingEdited()?.id ? 
+                checklistItemService.edit$.next({
+                  id: checklistItemBeingEdited()!.id!,
+                  data: checklistItemForm.getRawValue()
+                })
+              : checklistItemService.add$.next({
+                  item: checklistItemForm.getRawValue(),
+                  checklistId: checklist()?.id!,
+                })
+            "
             (close)="checklistItemBeingEdited.set(null)"
           />
         </ng-template>
@@ -67,6 +76,14 @@ export default class ChecklistComponent {
 
       if(!checklistItem) {
         this.checklistItemForm.reset();
+      }
+      else{
+        this.checklistItemForm.patchValue(
+          {
+            ...this.checklistItemForm,
+            ...checklistItem
+          }
+        )
       }
     })
   }
