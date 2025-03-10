@@ -32,13 +32,32 @@ import { ChecklistItem, RemoveChecklistItem } from '../../shared/interfaces/chec
       </ul>
     </section>
   `,
-  styles: `
+  styles: [
+    `
+      checklist-item {
+        cursor: pointer;
+        user-select: none;
+      }
+      ul {
+        padding: 0;
+        margin: 0;
+      }
+      li {
+        font-size: 1.5em;
+        display: flex;
+        justify-content: space-between;
+        background: var(--color-light);
+        list-style-type: none;
+        margin-bottom: 1rem;
+        padding: 1rem;
 
-    .checklist-item {
-      cursor: pointer;
-      user-select: none;
-    }
-  `
+        button {
+          margin-left: 1rem;
+        }
+      }
+    `,
+  ]
+
 })
 export class ChecklistItemListComponent {
   checklistItems = input.required<ChecklistItem[]>();

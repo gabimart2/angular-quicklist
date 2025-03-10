@@ -16,7 +16,13 @@ import { RouterLink } from '@angular/router';
       <button (click)="reset.emit(checklist().id)">Reset</button>
     </header>
   `,
-  styles: ``
+  styles: [
+    `
+      button {
+        margin-left: 1rem;
+      }
+    `,
+  ]
 })
 export class ChecklistHeaderComponent {
   checklist = input.required<Checklist>()
